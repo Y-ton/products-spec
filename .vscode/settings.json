@@ -1,0 +1,10 @@
+{
+  "tinymist.rootPath": "${workspaceFolder}",
+  "tinymist.fontPaths": ["${workspaceFolder}/fonts"],
+  "tinymist.preview.refresh": "onType",
+  "tinymist.preview.scrollSync": "onSelectionChange",
+  "tinymist.exportPdf": "never",
+  "tinymist.previewFeature": "enable",
+  "tinymist.previewer": "myriad-dreamin.tinymist",
+  "editor.codeLens": false
+}

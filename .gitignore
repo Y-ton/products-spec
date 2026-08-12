@@ -1,0 +1,7 @@
+*.pdf
+site/
+.DS_Store
+.live-preview/
+.preview-server.*
+.preview-watch.*
+*.log

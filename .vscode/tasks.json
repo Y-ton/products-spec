@@ -1,0 +1,13 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Spec: Tinymist Live Preview",
+      "command": "runCommands",
+      "args": {
+        "commands": ["typst-preview.preview"]
+      },
+      "problemMatcher": []
+    }
+  ]
+}
