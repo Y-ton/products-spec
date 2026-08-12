@@ -19,7 +19,7 @@
 #cover(
   company: COMPANY,
   product: PRODUCT,
-  subtitle: "一体化CX677XK系列载板",
+  subtitle: "一体化CX677XK载板",
   doc-no: DOC_NO,
   hw-version: HW_VER,
   doc-version: DOC_VER,
@@ -350,7 +350,8 @@
 
 + *供电*：推荐 15W 以上适配器。
 + *ESD*：接口已加 TVS 保护，操作时仍建议佩戴防静电手环。
-
++ *散热*：漏铜区域应使用散热片或散热器，以保证设备稳定安全运行，否则可能导致设备损坏。
++ *散热*：漏铜区域应使用散热片或散热器，以保证设备稳定安全运行，否则可能导致设备损坏。
 #v(1.5em)
 #hairline()
 #v(0.5em)

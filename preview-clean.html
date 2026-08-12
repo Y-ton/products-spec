@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>spec-clean 预览 — SHT1UBA</title>
+  <style>
+    :root {
+      --ink: #1a1a1a; --body: #3d3d3d; --mute: #5c5c5c; --faint: #949494;
+      --rule: #e0e0e0; --wash: #f8f9fa; --accent: #2563eb; --warn: #dc2626; --caution: #ca8a04;
+      --mono: "SF Mono", Menlo, Consolas, monospace;
+      --page-w: 794px; --margin: 68px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #e8eaed; font-family: "PingFang SC","Helvetica Neue","Noto Sans CJK SC",Arial,sans-serif; color: var(--ink); padding: 20px; font-size: 10.5pt; line-height: 1.6; }
+    .toolbar { max-width: var(--page-w); margin: 0 auto 14px; font-size: 11px; color: var(--faint); }
+    .toolbar b { color: var(--ink); }
+    .pages { display: flex; flex-direction: column; gap: 20px; align-items: center; }
+    .page { width: var(--page-w); min-height: 1123px; background: #fff; box-shadow: 0 2px 12px rgba(0,0,0,.1); padding: var(--margin); position: relative; color: var(--body); }
+    .page.cover { display: flex; flex-direction: column; min-height: 1123px; }
+    .cover-top { display: flex; justify-content: space-between; align-items: center; font-size: 9pt; color: var(--faint); padding-bottom: 8px; border-bottom: 1.2px solid var(--ink); flex-shrink: 0; }
+    .cover-top .doc-type { color: var(--mute); }
+    .cover-body { margin-top: 0; flex: 1; display: flex; flex-direction: column; justify-content: center; padding-bottom: 8%; }
+    .cover-product { font-family: var(--mono); font-size: 26pt; font-weight: 700; letter-spacing: -.6px; line-height: 1.15; color: var(--ink); }
+    .cover-sub { font-size: 12pt; color: var(--mute); margin-top: 14px; }
+    .cover-sum { margin-top: 28px; font-size: 10pt; color: var(--mute); line-height: 1.75; max-width: 82%; }
+    .cover-bottom { margin-top: auto; padding-top: 18px; border-top: .4px solid var(--rule); display: grid; grid-template-columns: 1.45fr 1fr .85fr 1fr; gap: 8px 18px; font-size: 7.5pt; color: var(--faint); }
+    .cover-bottom .v { font-family: var(--mono); font-size: 9pt; color: var(--ink); margin-top: 6px; }
+    .key-points { margin: 4px 0 12px; }
+    .key-points li { list-style: none; display: grid; grid-template-columns: 0.55em 1fr; gap: 0.45em; font-size: 10pt; line-height: 1.45; margin-bottom: 5px; color: var(--body); }
+    .key-points li::before { content: "—"; color: var(--faint); }
+    .header { display: flex; justify-content: space-between; font-size: 8pt; color: var(--faint); padding-bottom: 6px; border-bottom: .4px solid var(--rule); margin-bottom: 22px; }
+    .footer { position: absolute; bottom: var(--margin); left: var(--margin); right: var(--margin); border-top: .4px solid var(--rule); padding-top: 6px; display: flex; justify-content: space-between; font-size: 8pt; color: var(--faint); }
+    h1 { font-size: 13pt; font-weight: 700; margin: 28px 0 16px; color: var(--ink); }
+    h1:first-of-type { margin-top: 0; }
+    h2 { font-size: 10.5pt; font-weight: 700; margin: 22px 0 14px; color: var(--mute); }
+    p { color: var(--body); margin-bottom: 10px; text-align: justify; }
+    table { width: 100%; border-collapse: collapse; margin: 4px 0 14px; font-size: 10pt; table-layout: fixed; }
+    thead th { font-size: 8.5pt; font-weight: 700; color: var(--mute); text-align: left; padding: 6px 6px 7px; border-bottom: .55px solid var(--ink); }
+    tbody td { padding: 6px 6px 7px; border-bottom: .35px solid var(--rule); vertical-align: top; word-wrap: break-word; text-align: left; color: var(--body); }
+    .tbl-2 col:nth-child(1) { width: 22%; }
+    .tbl-2 col:nth-child(2) { width: 78%; }
+    .tbl-5 col:nth-child(1) { width: 12%; }
+    .tbl-5 col:nth-child(2) { width: 22%; }
+    .tbl-5 col:nth-child(3) { width: 10%; }
+    .tbl-5 col:nth-child(4) { width: 18%; }
+    .tbl-5 col:nth-child(5) { width: 38%; }
+    .mono { font-family: var(--mono); font-size: 9.5pt; font-variant-numeric: tabular-nums; }
+    .conn-block { margin-top: 16px; }
+    .conn-head { padding: 6px 0 4px; }
+    .conn-closeup { margin: 0 0 10px; }
+    .conn-closeup .fig { height: 168px; flex-direction: column; gap: 6px; text-align: center; line-height: 1.45; padding: 12px; }
+    .conn-closeup .fig.tall { height: 180px; }
+    .conn-closeup .fig .hi { color: #2563eb; font-weight: 600; }
+    .conn-closeup .fig .dim { color: #ccc; font-size: 8pt; }
+    .conn-title { font-size: 11pt; font-weight: 700; line-height: 1.3; }
+    .conn-detail { font-size: 9pt; color: var(--faint); margin-top: 2px; line-height: 1.4; }
+    .badge { font-family: var(--mono); font-size: 9pt; font-weight: 700; color: var(--ink); line-height: 1.6; }
+    .conn-head.with-badge { display: grid; grid-template-columns: 2.2em 1fr; gap: 0.5em; align-items: start; }
+    .fig-grid { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 16px; margin: 10px 0 16px; }
+    .fig { background: #fff; border: .35px solid var(--rule); height: 155px; display: flex; align-items: center; justify-content: center; color: var(--faint); font-size: 9pt; }
+    .fig.tall { height: 200px; }
+    figcaption { font-size: 8.5pt; color: var(--faint); margin-top: 3px; }
+    .callout { border-left: 2px solid var(--warn); padding: 6px 0 6px 12px; margin: 10px 0; font-size: 9.5pt; color: var(--mute); }
+    .callout.note { border-left-color: var(--accent); }
+    .callout.caution { border-left-color: var(--caution); background: #fffbeb; padding-left: 12px; margin-left: -12px; padding-right: 0; }
+    .callout .t { font-size: 9pt; font-weight: 700; margin-bottom: 3px; }
+    .callout.warn .t { color: var(--warn); }
+    .callout.note .t { color: var(--accent); }
+    .callout.caution .t { color: var(--caution); }
+    ol { margin: 10px 0 16px 1.3em; color: var(--body); }
+    ol li { margin-bottom: 7px; }
+    .disclaimer { font-size: 8pt; color: var(--faint); margin-top: 20px; padding-top: 10px; border-top: .4px solid var(--rule); }
+  </style>
+</head>
+<body>
+  <div class="toolbar">预览 · <b>spec-clean.typ</b> — SHT1UBA PCBA 工程可读版</div>
+  <div class="pages">
+
+    <section class="page cover">
+      <div class="cover-top">
+        <span>无锡星汉电子技术有限公司</span>
+        <span class="doc-type">产品规格书</span>
+      </div>
+      <div class="cover-body">
+        <div class="cover-product">SHT1UBA</div>
+        <div class="cover-sub">高集成CX677XK系列载板</div>
+      </div>
+      <div class="cover-bottom">
+        <div><div>文档编号</div><div class="v">SHT1UBA</div></div>
+        <div><div>硬件版本</div><div class="v">HW V1.0</div></div>
+        <div><div>文档版本</div><div class="v">Rev A</div></div>
+        <div><div>发布日期</div><div class="v">2026-08-06</div></div>
+      </div>
+    </section>
+
+    <section class="page">
+      <div class="header"><span>无锡星汉电子技术有限公司 · SHT1UBA</span><span>Rev A</span></div>
+      <h1>产品概述</h1>
+      <h2>功能简介</h2>
+      <p><strong>SHT1UBA</strong>此产品为高集成度、高性能网络处理载板，集成宸芯CX677XK系列模块，尺寸仅为115*62mm，并支持手机、电脑等终端设备通过2.4GHz WiFi接入网络。同时可支持北斗/GPS定位，非常适合于便携应用。</p>
+      <figure><div class="fig tall">产品总览图 — 标注 USB-C、天线、GPIO 排针及主要元件</div><figcaption>图 1  产品外观总览</figcaption></figure>
+      <h2>主要特征</h2>
+      <ul class="key-points">
+        <li>支持宸芯CX677XK系列模块</li>
+        <li>板载 2.4GHz WiFi</li>
+        <li>支持北斗/GPS定位</li>
+        <li>网口、UART等接口</li>
+      </ul>
+      <div class="footer"><span>SHT1UBA 产品规格书</span><span>第 2 页</span></div>
+    </section>
+
+    <section class="page">
+      <div class="header"><span>无锡星汉电子技术有限公司 · SHT1UBA</span><span>Rev A</span></div>
+      <h1>机械尺寸</h1>
+      <div class="fig-grid">
+        <figure><div class="fig tall">PCB 俯视图尺寸标注<br>长 48.3 mm × 宽 25.4 mm</div><figcaption>图 5  俯视图尺寸</figcaption></figure>
+        <figure><div class="fig tall">侧视图尺寸标注<br>最高元件 8.5 mm（USB-C）</div><figcaption>图 6  侧视图尺寸</figcaption></figure>
+      </div>
+      <div class="footer"><span>SHT1UBA 产品规格书</span><span>第 3 页</span></div>
+    </section>
+
+    <section class="page">
+      <div class="header"><span>无锡星汉电子技术有限公司 · SHT1UBA</span><span>Rev A</span></div>
+      <h1>技术规格</h1>
+      <h2>基础参数</h2>
+      <table class="tbl-2"><colgroup><col><col></colgroup><thead><tr><th>参数</th><th>规格</th></tr></thead>
+      <tbody>
+        <tr><td>天线类型</td><td>1 x WiFi IPEX 天线接口<br>1 x 北斗/GPS IPEX 天线接口</td></tr>
+        <tr><td>宸芯模块接口</td><td>1 x 100 Mbps 以太网口，1 x TTL UART 接口，1 x 复位信号，3 x 指示灯信号，电源（BTB 形式连接器）</td></tr>
+        <tr><td>以太网口</td><td>2 x 100 Mbps 以太网口（8 pin 1.0 mm 间距连接器）</td></tr>
+        <tr><td>其他接口</td><td>1 x 上电开关 + 2 x 指示灯（5 pin 1.0 mm 间距连接器）<br>1 x 音频接口（7 pin 1.0 mm 间距连接器）<br>1 x 音频接口（7 pin 1.0 mm 间距连接器）<br>1 x 3 个 GPIO 接口（7 pin 1.0 mm 间距连接器）<br>1 x 调试串口 + 1 x TTL UART + 2 x GPIO（9 pin 1.0 mm 间距连接器）</td></tr>
+        <tr><td>指示灯</td><td>2 x UART 收发指示灯<br>3 x 宸芯模块指示灯（红 / 绿 / 蓝）</td></tr>
+        <tr><td>供电方式</td><td>9–48 V（1.0 mm 间距 4 Pin 插座）</td></tr>
+        <tr><td>底板尺寸</td><td>63 mm × 67 mm × 10 mm</td></tr>
+        <tr><td>组合尺寸</td><td>63 mm × 67 mm × 19 mm</td></tr>
+        <tr><td>温度范围</td><td>存储温度：−40 °C ～ +125 °C<br>工作温度：−20 °C ～ +65 °C</td></tr>
+      </tbody></table>
+      <h2>无线参数</h2>
+      <table class="tbl-2"><colgroup><col><col></colgroup><thead><tr><th>参数</th><th>规格</th></tr></thead>
+      <tbody>
+        <tr><td>工作频率</td><td>Wi-Fi：2412–2462 MHz<br>北斗/GPS：1559–1577 MHz</td></tr>
+        <tr><td>信道带宽</td><td>Wi-Fi：20 MHz</td></tr>
+        <tr><td>输出功率</td><td>Wi-Fi：0.5 W</td></tr>
+        <tr><td>接收灵敏度</td><td>Wi-Fi：-90 dBm</td></tr>
+        <tr><td>调制方式</td><td>OFDM BPSK / QPSK / 16-QAM / 64-QAM</td></tr>
+        <tr><td>传输速率</td><td>Wi-Fi：最大 40 Mbps</td></tr>
+      </tbody></table>
+      <div class="footer"><span>SHT1UBA 产品规格书</span><span>第 4 页</span></div>
+    </section>
+
+    <section class="page">
+      <div class="header"><span>无锡星汉电子技术有限公司 · SHT1UBA</span><span>Rev A</span></div>
+      <h1>技术规格</h1>
+      <h2>软件特性</h2>
+      <table class="tbl-2"><colgroup><col><col></colgroup><thead><tr><th>参数</th><th>规格</th></tr></thead>
+      <tbody>
+        <tr><td>Bootloader</td><td>U-Boot</td></tr>
+        <tr><td>Linux 内核</td><td>3.18.19</td></tr>
+        <tr><td>有线网络</td><td>IP 地址可配置<br>子网掩码可配置</td></tr>
+        <tr><td>Wi-Fi 特性</td><td>输出功率可调节；支持 AP 模式；ESSID 可配置；支持自适应速率模式；支持 WMM/802.11e QoS；支持距离优化；支持 MAC 地址过滤；连接状态显示；WPA/WPA2/WEP 加密；隐藏 ESSID</td></tr>
+        <tr><td>北斗/GPS</td><td>支持网络透传北斗/GPS 原始定位数据</td></tr>
+        <tr><td>管理特征</td><td>支持网页管理；支持 SSH 安全管理；导入/导出配置信息；恢复出厂配置；在线更新固件</td></tr>
+      </tbody></table>
+      <div class="footer"><span>SHT1UBA 产品规格书</span><span>第 5 页</span></div>
+    </section>
+
+    <section class="page">
+      <div class="header"><span>无锡星汉电子技术有限公司 · SHT1UBA</span><span>Rev A</span></div>
+      <h1>接口定义</h1>
+      <h2>连接器总览</h2>
+      <table class="tbl-5"><colgroup><col><col><col><col><col></colgroup><thead><tr><th>位号</th><th>名称</th><th>Pin 数</th><th>类型</th><th>功能</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">J1</td><td>USB-C</td><td class="mono">16</td><td>Type-C SMT</td><td>供电 · 烧录 · 串口调试</td></tr>
+        <tr><td class="mono">J2</td><td>GPIO 排针</td><td class="mono">20</td><td>2.54 mm 2×10</td><td>通用 IO / ADC / SPI / I2C</td></tr>
+        <tr><td class="mono">J3</td><td>UART 烧录</td><td class="mono">6</td><td>2.54 mm 1×6</td><td>无 USB 时的备用烧录</td></tr>
+        <tr><td class="mono">J4</td><td>天线</td><td class="mono">1</td><td>IPEX 1 代</td><td>外接天线（与板载二选一）</td></tr>
+      </tbody></table>
+      <div class="conn-block">
+        <div class="conn-head"><div class="conn-title">GPIO 接口</div></div>
+        <figure class="conn-closeup">
+          <div class="fig tall">GPIO 区域局部特写<br><span class="hi">GPIO 高亮</span><span class="dim"> · SHT1UBA-V1.svg</span></div>
+          <figcaption>图 7  GPIO 接口 局部特写</figcaption>
+        </figure>
+        <table class="tbl-5"><colgroup><col><col><col><col><col></colgroup><thead><tr><th>Pin</th><th>信号</th><th>方向</th><th>电平</th><th>说明</th></tr></thead>
+        <tbody>
+          <tr><td class="mono">A4/B9</td><td class="mono">VBUS</td><td>In</td><td class="mono">5 V</td><td>USB 总线供电，经 LDO 降压至 3.3 V</td></tr>
+          <tr><td class="mono">A6/B6</td><td class="mono">D+</td><td>I/O</td><td class="mono">3.3 V</td><td>USB 2.0 数据 +，经 CP2102N 转 UART</td></tr>
+          <tr><td class="mono">A7/B7</td><td class="mono">D−</td><td>I/O</td><td class="mono">3.3 V</td><td>USB 2.0 数据 −</td></tr>
+          <tr><td class="mono">A5/B5</td><td class="mono">CC1/CC2</td><td>I/O</td><td>—</td><td>方向检测，5.1 kΩ 下拉</td></tr>
+          <tr><td class="mono">A1/B12</td><td class="mono">GND</td><td>—</td><td>—</td><td>信号地 / 屏蔽</td></tr>
+        </tbody></table>
+      </div>
+      <div class="footer"><span>SHT1UBA 产品规格书</span><span>第 6 页</span></div>
+    </section>
+
+    <section class="page">
+      <div class="header"><span>无锡星汉电子技术有限公司 · SHT1UBA</span><span>Rev A</span></div>
+      <h1>接口定义（续）</h1>
+      <div class="conn-block" style="margin-top:0">
+        <div class="conn-head"><div class="conn-title">以太网接口</div></div>
+        <figure class="conn-closeup">
+          <div class="fig tall">以太网区域局部特写<br><span class="hi">以太网高亮</span><span class="dim"> · SHT1UBA-V1.svg</span></div>
+          <figcaption>图 8  以太网接口 局部特写</figcaption>
+        </figure>
+        <table class="tbl-5"><colgroup><col><col><col><col><col></colgroup><thead><tr><th>Pin</th><th>信号</th><th>方向</th><th>电平</th><th>说明</th></tr></thead>
+        <tbody>
+          <tr><td class="mono">1</td><td class="mono">3V3</td><td>Out</td><td class="mono">3.3 V</td><td>对外 3.3 V 供电，≤ 500 mA</td></tr>
+          <tr><td class="mono">2</td><td class="mono">GND</td><td>—</td><td>—</td><td>信号地</td></tr>
+          <tr><td class="mono">3</td><td class="mono">GPIO0</td><td>I/O</td><td class="mono">3.3 V</td><td>Boot 选择；上电拉低进入下载模式</td></tr>
+          <tr><td class="mono">4</td><td class="mono">GPIO1</td><td>I/O</td><td class="mono">3.3 V</td><td>ADC1_CH0</td></tr>
+          <tr><td class="mono">5</td><td class="mono">GPIO2</td><td>I/O</td><td class="mono">3.3 V</td><td>ADC1_CH1 / 板载 LED</td></tr>
+          <tr><td class="mono">8</td><td class="mono">GPIO5</td><td>I/O</td><td class="mono">3.3 V</td><td>I2C SCL</td></tr>
+          <tr><td class="mono">16</td><td class="mono">GPIO20</td><td>I/O</td><td class="mono">3.3 V</td><td>UART0 RX</td></tr>
+          <tr><td class="mono">17</td><td class="mono">GPIO21</td><td>I/O</td><td class="mono">3.3 V</td><td>UART0 TX</td></tr>
+          <tr><td class="mono">18</td><td class="mono">EN</td><td>In</td><td class="mono">3.3 V</td><td>芯片使能，低电平复位，10 kΩ 上拉</td></tr>
+          <tr><td class="mono">20</td><td class="mono">GND</td><td>—</td><td>—</td><td>信号地</td></tr>
+        </tbody></table>
+      </div>
+      <div class="footer"><span>SHT1UBA 产品规格书</span><span>第 7 页</span></div>
+    </section>
+
+    <section class="page">
+      <div class="header"><span>无锡星汉电子技术有限公司 · SHT1UBA</span><span>Rev A</span></div>
+      <h1>接口定义（续）</h1>
+      <div class="conn-block" style="margin-top:0">
+        <div class="conn-head with-badge"><span class="badge">J3</span><div><div class="conn-title">UART 烧录接口</div><div class="conn-detail">6 Pin · 2.54 mm 1×6 · 备用</div></div></div>
+        <figure class="conn-closeup">
+          <div class="fig tall">J3 局部放大特写<br><span class="hi">UART 烧录口高亮</span><span class="dim"> · 其余置灰 · 待替换板图</span></div>
+          <figcaption>图 9  J3 局部特写（自动高亮）</figcaption>
+        </figure>
+        <table class="tbl-5"><colgroup><col><col><col><col><col></colgroup><thead><tr><th>Pin</th><th>信号</th><th>方向</th><th>电平</th><th>说明</th></tr></thead>
+        <tbody>
+          <tr><td class="mono">1</td><td class="mono">3V3</td><td>Out</td><td class="mono">3.3 V</td><td>对外供电</td></tr>
+          <tr><td class="mono">2</td><td class="mono">EN</td><td>In</td><td class="mono">3.3 V</td><td>芯片使能</td></tr>
+          <tr><td class="mono">3</td><td class="mono">GPIO0</td><td>I/O</td><td class="mono">3.3 V</td><td>Boot 选择，烧录时拉低</td></tr>
+          <tr><td class="mono">4</td><td class="mono">TX</td><td>Out</td><td class="mono">3.3 V</td><td>UART0_TX → GPIO21</td></tr>
+          <tr><td class="mono">5</td><td class="mono">RX</td><td>In</td><td class="mono">3.3 V</td><td>UART0_RX → GPIO20</td></tr>
+          <tr><td class="mono">6</td><td class="mono">GND</td><td>—</td><td>—</td><td>信号地</td></tr>
+        </tbody></table>
+      </div>
+      <div class="conn-block">
+        <div class="conn-head with-badge"><span class="badge">J4</span><div><div class="conn-title">天线接口</div><div class="conn-detail">1 Pin · IPEX 1 代 · 与板载天线二选一</div></div></div>
+        <figure class="conn-closeup">
+          <div class="fig tall">J4 局部放大特写<br><span class="hi">IPEX 天线口高亮</span><span class="dim"> · 其余置灰 · 待替换板图</span></div>
+          <figcaption>图 10  J4 局部特写（自动高亮）</figcaption>
+        </figure>
+        <table class="tbl-5"><colgroup><col><col><col><col><col></colgroup><thead><tr><th>Pin</th><th>信号</th><th>方向</th><th>电平</th><th>说明</th></tr></thead>
+        <tbody>
+          <tr><td class="mono">1</td><td class="mono">ANT</td><td>—</td><td>50 Ω</td><td>外接天线端口，需断开 R_ANT 跳线</td></tr>
+        </tbody></table>
+      </div>
+      <div class="footer"><span>SHT1UBA 产品规格书</span><span>第 8 页</span></div>
+    </section>
+
+    <section class="page">
+      <div class="header"><span>无锡星汉电子技术有限公司 · SHT1UBA</span><span>Rev A</span></div>
+      <h1>使用须知</h1>
+      <div class="callout warn"><div class="t">警告</div><strong>GPIO0</strong> 在上电时若被外部拉低，芯片将进入下载模式而非正常启动。除 Boot 按键外，请避免外部电路强制拉低该引脚。</div>
+      <div class="callout note"><div class="t">注意</div>USB D+/D−（GPIO18/GPIO19）与 J1 内部相连，J2 排针上请勿同时使用这两个 GPIO。</div>
+      <div class="callout caution"><div class="t">提示</div>外部 3.3 V 供电时纹波应 &lt; 50 mV，且不得与 USB 同时供电。</div>
+      <ol>
+        <li><strong>供电</strong>：推荐 USB-C 5 V / 1 A 以上适配器。外部 3.3 V 供电时纹波 &lt; 50 mV，且不得与 USB 同时供电。</li>
+        <li><strong>天线</strong>：默认板载 PCB 天线。外接 IPEX 时断开 R_ANT 跳线（0 Ω），接至 J4。</li>
+        <li><strong>GPIO 限制</strong>：单 Pin 最大 12 mA，合计不超过 80 mA；ADC 输入不得超过 3.3 V。</li>
+        <li><strong>烧录</strong>：USB-C 直连即可；无 USB 时用 J3 + USB-TTL，烧录时拉低 GPIO0 上电。</li>
+        <li><strong>ESD</strong>：接口已加 TVS 保护，操作时仍建议佩戴防静电手环。</li>
+      </ol>
+      <p class="disclaimer">本文档参数基于设计目标及典型测试条件，实际产品可能因批次略有差异。无锡星汉电子技术有限公司 保留修改规格的权利，恕不另行通知。</p>
+      <div class="footer"><span>SHT1UBA 产品规格书</span><span>第 9 页</span></div>
+    </section>
+
+  </div>
+</body>
+</html>
