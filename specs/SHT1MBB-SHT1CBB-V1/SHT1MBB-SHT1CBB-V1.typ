@@ -61,6 +61,22 @@
   [接口定义见下文；板图 SVG 中标注 conn- 前缀 id 后自动生成局部特写],
 )
 
+== 系统框图
+
+#let block-diagram-frame(path, caption-text) = figure(
+  block(
+    width: 100%,
+    height: 220pt,
+    align(center + horizon, image(path, width: 100%, height: 100%, fit: "contain")),
+  ),
+  caption: caption-text,
+)
+
+#block-diagram-frame(
+  "/specs/SHT1MBB-SHT1CBB-V1/assets/system-block.svg",
+  [系统功能框图 — MBB 主控、CBB 载板与对外通信接口],
+)
+
 = 机械尺寸
 
 #let mech-frame(path, caption-text) = figure(

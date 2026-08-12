@@ -29,7 +29,7 @@
   ],
   //highlights: (
     //("主控", "CX677XK"),
-    //("供电", "USB-C 5 V"),∏
+    //("供电", "USB-C 5 V"),
   //("IO 电平", "3.3 V LVTTL"),
     //("尺寸", "115 × 62 mm"),
   //)
@@ -44,7 +44,7 @@
 
 //#revision-tbl(
 //  [Rev A], [2026-08-06], [初始版本发布], [Ton],
-//)˚
+//)
 
 #pagebreak()
 
@@ -52,7 +52,7 @@
 
 == 功能简介
 
-*#PRODUCT*此产品为高集成度、高性能网络处理载板，集成宸芯CX677XK系列模块，尺寸仅为110*65mm，并支持手机、电脑等终端设备通过2.4GHz WiFi接入网络。同时可支持北斗/GPS定位，双百兆网口。
+*#PRODUCT* 此产品为高集成度、高性能网络处理载板，集成宸芯 CX677XK 系列模块，尺寸仅为 110×65 mm，并支持手机、电脑等终端设备通过 2.4GHz WiFi 接入网络。同时可支持北斗/GPS 定位，双百兆网口。
 
 == 产品外观
 
@@ -69,6 +69,22 @@
   [支持北斗/GPS定位],
   [网口、UART等通信接口],
   [音频接口],
+)
+
+== 系统框图
+
+#let block-diagram-frame(path, caption-text) = figure(
+  block(
+    width: 100%,
+    height: 220pt,
+    align(center + horizon, image(path, width: 100%, height: 100%, fit: "contain")),
+  ),
+  caption: caption-text,
+)
+
+#block-diagram-frame(
+  "/specs/SHT1UBA-V1/assets/system-block.svg",
+  [系统功能框图 — 主芯片/模块与对外通信接口],
 )
 
 //== 技术参数
@@ -306,7 +322,7 @@
   fig-desc: [天线区域局部特写],
   svg-paths: BOARD-SVGS,
   [Wi-Fi], [MMCX], [50 Ω], [2412-2462 MHz], [MMCX内孔形式],
-  [GNSS], [MMCX], [50 Ω], [1559-1577 MHz], [MMCX内孔形式，3.3V有源馈电，GNSS与主控IC的],
+  [GNSS], [MMCX], [50 Ω], [1559-1577 MHz], [MMCX内孔形式，3.3V有源馈电，GNSS与主控IC的UART1进行通信],
 )
 
 //#note[
