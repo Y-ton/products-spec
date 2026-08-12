@@ -803,7 +803,7 @@
   header: none,
   footer: none,
 )[
-  #set text(font: ("PingFang SC", "Noto Sans CJK SC", "Helvetica Neue", "Arial"))
+  #set text(font: ("Noto Sans CJK SC", "PingFang SC", "Helvetica Neue", "Arial"))
   #let meta-cols = (1.45fr, 1fr, 0.85fr, 1fr)
 
   // 顶栏
@@ -916,7 +916,7 @@
   body,
 ) = {
   set text(
-    font: ("PingFang SC", "Noto Sans CJK SC", "Helvetica Neue", "Arial"),
+    font: ("Noto Sans CJK SC", "PingFang SC", "Helvetica Neue", "Arial"),
     size: 10.5pt,
     fill: body-cl,
     lang: "zh",
