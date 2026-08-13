@@ -250,38 +250,37 @@
 
 = 机械尺寸
 
+== 组合总成
+
+// 两板扣合后的总高度与侧向轮廓 → assets/mech_assy_side.svg
+#mech-plate-set(
+  side-placeholder: true,
+  side-caption: [组合侧视图 — MBB 与 CBB 配套安装],
+  side-ph: [组合侧视图 — 扣合后剖面，替换 assets/mech_assy_side.svg],
+)
+
 == MBB 主控板
 
-#plate-fig(
-  "/specs/SHT1MBB-SHT1CBB-V1/assets/mech_mbb_top.svg",
-  [MBB 俯视图（待更新）],
-  max-height: 220pt,
-  scale: 2 / 3,
-)
-#v(1em)
-#plate-fig(
-  "/specs/SHT1MBB-SHT1CBB-V1/assets/mech_mbb_bottom.svg",
-  [MBB 底视图（待更新）],
-  max-height: 220pt,
-  scale: 2 / 3,
-  ref-path: "/specs/SHT1MBB-SHT1CBB-V1/assets/mech_mbb_top.svg",
+#mech-plate-set(
+  top: "/specs/SHT1MBB-SHT1CBB-V1/assets/mech_mbb_top.svg",
+  bottom: "/specs/SHT1MBB-SHT1CBB-V1/assets/mech_mbb_bottom.svg",
+  side-placeholder: true,
+  top-caption: [MBB 俯视图（待更新）],
+  bottom-caption: [MBB 底视图（待更新）],
+  side-caption: [MBB 侧视图（待更新）],
+  side-ph: [MBB 侧视图 — 替换 assets/mech_mbb_side.svg],
 )
 
 == CBB 载板
 
-#plate-fig(
-  "/specs/SHT1MBB-SHT1CBB-V1/assets/mech_cbb_top.svg",
-  [CBB 俯视图（待更新）],
-  max-height: 220pt,
-  scale: 2 / 3,
-)
-#v(1em)
-#plate-fig(
-  "/specs/SHT1MBB-SHT1CBB-V1/assets/mech_cbb_bottom.svg",
-  [CBB 底视图（待更新）],
-  max-height: 220pt,
-  scale: 2 / 3,
-  ref-path: "/specs/SHT1MBB-SHT1CBB-V1/assets/mech_cbb_top.svg",
+#mech-plate-set(
+  top: "/specs/SHT1MBB-SHT1CBB-V1/assets/mech_cbb_top.svg",
+  bottom: "/specs/SHT1MBB-SHT1CBB-V1/assets/mech_cbb_bottom.svg",
+  side-placeholder: true,
+  top-caption: [CBB 俯视图（待更新）],
+  bottom-caption: [CBB 底视图（待更新）],
+  side-caption: [CBB 侧视图（待更新）],
+  side-ph: [CBB 侧视图 — 替换 assets/mech_cbb_side.svg],
 )
 
 = 使用须知

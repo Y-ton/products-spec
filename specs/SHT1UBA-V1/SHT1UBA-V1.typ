@@ -290,15 +290,19 @@
 
 = 机械尺寸
 
-// 机械图缩至版心 2/3 宽，一图一行
-#plate-fig("/specs/SHT1UBA-V1/assets/mech_top.svg", [俯视图尺寸], max-height: 220pt, scale: 2 / 3)
-#v(1em)
-#plate-fig(
-  "/specs/SHT1UBA-V1/assets/mech_bottom.svg",
-  [底视图尺寸],
-  max-height: 220pt,
-  scale: 2 / 3,
-  ref-path: "/specs/SHT1UBA-V1/assets/mech_top.svg",
+// 侧视（可选）：
+//   不要侧视 — 不写 side / side-placeholder（如下）
+//   占位预留 — side-placeholder: true, side-caption: [...], side-ph: [...]
+//   已有 SVG — side: ".../mech_side.svg", side-caption: [...]
+#mech-plate-set(
+  top: "/specs/SHT1UBA-V1/assets/mech_top.svg",
+  bottom: "/specs/SHT1UBA-V1/assets/mech_bottom.svg",
+  top-caption: [俯视图尺寸],
+  bottom-caption: [底视图尺寸],
+//  side-placeholder: true,
+//  side-caption: [侧视图尺寸],
+//  side-ph: [侧视图 — Allegro 3D 剖面导出，替换 assets/mech_side.svg],
+//  side: "/specs/SHT1UBA-V1/assets/mech_side.svg",
 )
 
 = 使用须知

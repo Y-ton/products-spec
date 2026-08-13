@@ -95,6 +95,41 @@
   )
 }
 
+// 机械尺寸：俯视 / 底视 / 侧视。侧视默认不输出；需要占位或 SVG 时由规格书显式开启。
+#let mech-plate-set(
+  top: none,
+  bottom: none,
+  side: none,
+  side-placeholder: false,
+  ref-top: none,
+  top-caption: [俯视图尺寸],
+  bottom-caption: [底视图尺寸],
+  side-caption: [侧视图尺寸],
+  side-ph: [侧视图 — Allegro 3D 剖面或 STEP 导出后，替换对应 mech\_side.svg],
+  max-height: 220pt,
+  side-max-height: 160pt,
+  scale: 2 / 3,
+) = {
+  let ref = if ref-top != none { ref-top } else { top }
+  let show-side = side != none or side-placeholder
+  if top != none {
+    plate-fig(top, top-caption, max-height: max-height, scale: scale)
+    if bottom != none or show-side { v(1em) }
+  }
+  if bottom != none {
+    plate-fig(bottom, bottom-caption, max-height: max-height, scale: scale, ref-path: ref)
+    if show-side { v(1em) }
+  }
+  if side != none {
+    plate-fig(side, side-caption, max-height: side-max-height, scale: scale, ref-path: ref)
+  } else if side-placeholder {
+    figure(
+      ph(side-ph, h: 140pt),
+      caption: side-caption,
+    )
+  }
+}
+
 // ── 表格 — 全文档统一列宽，同类型表格纵向对齐 ────────────────
 #let col-2 = (1.1fr, 2.9fr)
 #let col-4 = (0.55fr, 0.75fr, 2.2fr, 0.7fr)

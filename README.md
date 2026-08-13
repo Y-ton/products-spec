@@ -42,27 +42,43 @@ typst compile specs/SHT1MBB-SHT1CBB-V1/SHT1MBB-SHT1CBB-V1.typ \
 
 路径均在 `specs/<产品>/assets/`，`BOARD-SVGS` 里用仓库根路径（以 `/` 开头）。
 
-**单板（1 块板）— 4 个 SVG**
+**单板（1 块板）— 板图 2 + 机械 3 个 SVG**
 
 | 文件 | 用途 |
 |------|------|
 | `<型号>-top.svg` | 板图正面（连接器 conn-* 标注） |
 | `<型号>-bottom.svg` | 板图背面 |
-| `mech_top.svg` | 机械尺寸俯视图 |
+| `mech_top.svg` | 机械尺寸俯视图（Allegro 2D 尺寸图导出） |
 | `mech_bottom.svg` | 机械尺寸底视图 |
+| `mech_side.svg` | 机械尺寸侧视图（Allegro 3D / STEP 剖面，见下） |
 
-**组合板（N 块板）— 每块板 4 个，共 4×N 个**
-
-例：MBB + CBB → **8 个 SVG**
+**组合板（MBB + CBB 示例）— 板图 4 + 机械 7 个 SVG**
 
 | 文件 | 用途 |
 |------|------|
 | `SHT1MBB-top.svg` / `SHT1MBB-bottom.svg` | MBB 板图正反面 |
 | `SHT1CBB-top.svg` / `SHT1CBB-bottom.svg` | CBB 板图正反面 |
-| `mech_mbb_top.svg` / `mech_mbb_bottom.svg` | MBB 机械图 |
-| `mech_cbb_top.svg` / `mech_cbb_bottom.svg` | CBB 机械图 |
+| `mech_mbb_top.svg` / `mech_mbb_bottom.svg` / `mech_mbb_side.svg` | MBB 机械三视图 |
+| `mech_cbb_top.svg` / `mech_cbb_bottom.svg` / `mech_cbb_side.svg` | CBB 机械三视图 |
+| `mech_assy_side.svg` | **组合总成侧视**（两板扣合后总高度与侧向轮廓） |
 
-`.typ` 里 `BOARD-SVGS` 只列**板图**四张（组合板把每块板的 top/bottom 都写上）；机械图在正文里 `#image` 引用。连接器在哪张 SVG 里，库会自动从那张提取特写。
+`.typ` 里 `BOARD-SVGS` 只列**板图**；机械图用 `#mech-plate-set(...)`。**侧视默认不显示**，由规格书自行决定：
+
+| 需求 | 写法 |
+|------|------|
+| 不要侧视 | 只写 `top` / `bottom`（不写 `side`、`side-placeholder`） |
+| 占位预留 | `side-placeholder: true` + `side-caption` / `side-ph` |
+| 已有 SVG | `side: ".../mech_side.svg"` + `side-caption` |
+
+**Allegro 机械图来源**
+
+| 视图 | 建议流程 |
+|------|----------|
+| 俯视 / 底视 | Fab / Dimension 图纸导出 SVG（与现有 `mech_top/bottom` 相同） |
+| 单板侧视 | Package Designer 3D 配好封装高度 → 导出 STEP，或 3D 正交侧视截图后在 Inkscape 标尺寸 → `mech_*_side.svg` |
+| 组合侧视 | MBB+CBB 3D 装配（或两板 STEP 叠合）→ 侧向剖面 / 轮廓 → `mech_assy_side.svg` |
+
+侧视就绪后，在 `#mech-plate-set` 里设 `side: ".../mech_side.svg"`（或先 `side-placeholder: true` 占位）。
 
 Inkscape 导出：每个连接器用 `<rect id="conn-xxx">` 标记；成组接口用 `conn-base` + `conn-base-*` 子 id。
 
