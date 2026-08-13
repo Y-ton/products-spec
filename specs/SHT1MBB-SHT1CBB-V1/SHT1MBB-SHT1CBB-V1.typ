@@ -63,47 +63,10 @@
 
 == 系统框图
 
-#let block-diagram-frame(path, caption-text) = figure(
-  block(
-    width: 100%,
-    height: 220pt,
-    align(center + horizon, image(path, width: 100%, height: 100%, fit: "contain")),
-  ),
-  caption: caption-text,
-)
-
-#block-diagram-frame(
+#plate-fig(
   "/specs/SHT1MBB-SHT1CBB-V1/assets/system-block.svg",
   [系统功能框图 — MBB 主控、CBB 载板与对外通信接口],
-)
-
-= 机械尺寸
-
-#let mech-frame(path, caption-text) = figure(
-  block(
-    width: 100%,
-    height: 200pt,
-    align(center + horizon, image(path, width: 100%, height: 100%, fit: "contain")),
-  ),
-  caption: caption-text,
-)
-
-== MBB 主控板
-
-#grid(
-  columns: (1fr, 1fr),
-  gutter: 14pt,
-  mech-frame("/specs/SHT1MBB-SHT1CBB-V1/assets/mech_mbb_top.svg", [MBB 俯视图（待更新）]),
-  mech-frame("/specs/SHT1MBB-SHT1CBB-V1/assets/mech_mbb_bottom.svg", [MBB 底视图（待更新）]),
-)
-
-== CBB 载板
-
-#grid(
-  columns: (1fr, 1fr),
-  gutter: 14pt,
-  mech-frame("/specs/SHT1MBB-SHT1CBB-V1/assets/mech_cbb_top.svg", [CBB 俯视图（待更新）]),
-  mech-frame("/specs/SHT1MBB-SHT1CBB-V1/assets/mech_cbb_bottom.svg", [CBB 底视图（待更新）]),
+  max-height: 220pt,
 )
 
 #pagebreak()
@@ -281,6 +244,44 @@
   svg-paths: BOARD-SVGS,
   [CTL_H], [MMCX/I-PEX], [O], [1.8 V], [输出高电平使能 PA，低电平使能 LNA，*连接器二选一*],
   [CTL_L], [MMCX], [O], [1.8 V], [输出低电平使能 PA，高电平使能 LNA],
+)
+
+#pagebreak()
+
+= 机械尺寸
+
+== MBB 主控板
+
+#plate-fig(
+  "/specs/SHT1MBB-SHT1CBB-V1/assets/mech_mbb_top.svg",
+  [MBB 俯视图（待更新）],
+  max-height: 220pt,
+  scale: 2 / 3,
+)
+#v(1em)
+#plate-fig(
+  "/specs/SHT1MBB-SHT1CBB-V1/assets/mech_mbb_bottom.svg",
+  [MBB 底视图（待更新）],
+  max-height: 220pt,
+  scale: 2 / 3,
+  ref-path: "/specs/SHT1MBB-SHT1CBB-V1/assets/mech_mbb_top.svg",
+)
+
+== CBB 载板
+
+#plate-fig(
+  "/specs/SHT1MBB-SHT1CBB-V1/assets/mech_cbb_top.svg",
+  [CBB 俯视图（待更新）],
+  max-height: 220pt,
+  scale: 2 / 3,
+)
+#v(1em)
+#plate-fig(
+  "/specs/SHT1MBB-SHT1CBB-V1/assets/mech_cbb_bottom.svg",
+  [CBB 底视图（待更新）],
+  max-height: 220pt,
+  scale: 2 / 3,
+  ref-path: "/specs/SHT1MBB-SHT1CBB-V1/assets/mech_cbb_top.svg",
 )
 
 = 使用须知

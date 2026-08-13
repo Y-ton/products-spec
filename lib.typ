@@ -12,7 +12,8 @@
 #let wash = rgb("#f8f9fa")
 #let accent = rgb("#2563eb")
 #let caution-cl = rgb("#ca8a04")
-#let mono = ("Menlo", "PT Mono", "Courier New", "PingFang SC")
+// DejaVu Sans Mono 随 Typst 内置，放首位保证本地预览与 CI 出的 PDF 字体一致
+#let mono = ("DejaVu Sans Mono", "Menlo", "PT Mono", "Courier New", "PingFang SC")
 
 #let hairline() = line(length: 100%, stroke: 0.4pt + rule)
 
@@ -58,6 +59,41 @@
     #text(size: 9pt, fill: faint)[#desc]
   ]
 ]
+
+#let svg-board-bounds(svg-text) = {
+  let m = svg-text.match(regex("viewBox=\"0 0 ([\\d.]+) ([\\d.]+)\""))
+  if m != none {
+    (w: float(m.captures.at(0)), h: float(m.captures.at(1)))
+  } else {
+    none
+  }
+}
+
+// ── 图纸类插图（机械尺寸、系统框图）───────────────────────────
+// scale：相对版心宽度比例；高度随图自适应，超过 max-height 时按高压缩并居中。
+// ref-path：与另一张图对齐 PCB 显示尺寸（底视图 viewBox 常比俯视图宽，需单独放大）。
+#let plate-fig(path, caption-text, max-height: 200pt, scale: 1.0, ref-path: none) = {
+  let effective-scale = scale
+  if ref-path != none {
+    let ref-vb = svg-board-bounds(read(ref-path))
+    let vb = svg-board-bounds(read(path))
+    if ref-vb != none and vb != none {
+      effective-scale = scale * vb.w / ref-vb.w
+    }
+  }
+  figure(
+    layout(size => {
+      let w = size.width * effective-scale
+      let natural = measure(image(path, width: w)).height
+      if natural > max-height {
+        align(center, image(path, height: max-height))
+      } else {
+        align(center, image(path, width: w))
+      }
+    }),
+    caption: caption-text,
+  )
+}
 
 // ── 表格 — 全文档统一列宽，同类型表格纵向对齐 ────────────────
 #let col-2 = (1.1fr, 2.9fr)
@@ -336,16 +372,7 @@
   (x: x0, y: y0, w: x1 - x0, h: y1 - y0)
 }
 
-#let svg-board-bounds(svg-text) = {
-  let m = svg-text.match(regex("viewBox=\"0 0 ([\\d.]+) ([\\d.]+)\""))
-  if m != none {
-    (w: float(m.captures.at(0)), h: float(m.captures.at(1)))
-  } else {
-    none
-  }
-}
-
-// 以高亮座子为准裁切：高亮必须完整，不必居中，显示效果优先
+// 以高亮座子为准裁切
 #let zoom-to-conn(
   svg-text,
   target-id,
@@ -368,14 +395,16 @@
   let near-left = board != none and box.x < board.w * 0.20
   let at-right-edge = board != none and (box.x + box.w > board.w * 0.85)
   let in-right-region = board != none and (box.x > board.w * 0.60)
-  // 露出板子左缘；贴顶左侧成组座子再收紧边距，放大倍率与底部接口一致
+  // 露出板子左缘；贴顶左侧成组座子仍按整幅 pad 取边距，放大倍率与底部接口一致
   let show-left-edge = board != none and (
     near-left or (near-top and box.x < board.w * 0.50)
   )
   let tight-group = multi and near-top and box.x < board.w * 0.50
 
+  // 横跨大半块板的成组接口宽度本身已够大，减半边距免得画幅过宽；
+  // 贴顶左侧的窄成组接口用整幅 pad，viewBox 宽度才与单接口特写落在同一档
   let margin = calc.min(box.w, box.h) * (
-    if tight-group { pad / 3.2 } else if multi { pad / 2 } else { pad }
+    if multi and not tight-group { pad / 2 } else { pad }
   )
 
   // 贴板边时 padding 往板内偏，避免 viewBox 落到板外大片空白
@@ -727,6 +756,8 @@
     title: name,
     group: group,
   )
+  // 图注与紧随其后的 Pin 表拉开距离，否则图注上下留白接近，看着像属于表格
+  v(0.7em)
   make-tbl(..rows)
   v(0.5em)
 }
@@ -804,13 +835,14 @@
   footer: none,
 )[
   #set text(font: ("Noto Sans CJK SC", "PingFang SC", "Helvetica Neue", "Arial"))
-  #let meta-cols = (1.45fr, 1fr, 0.85fr, 1fr)
+  #let meta-cols = (1fr, 1fr, 1fr, 1fr)
 
-  // 顶栏
+  // 顶栏 — 与底部元数据同色
   #grid(
     columns: (1fr, auto),
     align: horizon,
-    text(size: 9pt, fill: faint)[#company], text(size: 9pt, fill: mute)[产品规格书],
+    text(size: 9pt, weight: "medium", fill: ink)[#company],
+    text(size: 9pt, weight: "medium", fill: ink)[产品规格书],
   )
   #v(8pt)
   #block(width: 100%, height: 1.2pt, fill: ink)
@@ -841,7 +873,8 @@
     )[
       #grid(
         columns: meta-cols,
-        column-gutter: 1.1em,
+        column-gutter: 1.4em,
+        align: horizon,
         ..highlights.map(((k, val)) => stack(
           spacing: 0.28cm,
           text(size: 7.5pt, fill: faint)[#k],
@@ -853,32 +886,24 @@
 
   #v(1.35fr)
 
-  // 文档元数据 — 与上方参数列宽对齐
+  // 文档元数据 — 各栏按自身宽度排列，中间以 1fr 撑开：间距相等且两端贴齐版心。
+  // 等宽列会让末栏内容短时右侧空出一块，故不用 meta-cols。
+  #let meta-items = (
+    ("文档编号", doc-no),
+    ("硬件版本", hw-version),
+    ("文档版本", doc-version),
+    ("发布日期", date),
+  )
+  #let meta-cell(k, val) = stack(
+    spacing: 0.26cm,
+    text(size: 7.5pt, fill: faint, tracking: 0.08em)[#k],
+    text(font: mono, size: 9.5pt, weight: "medium", fill: ink)[#val],
+  )
   #hairline()
-  #v(0.55cm)
+  #v(0.5cm)
   #grid(
-    columns: meta-cols,
-    column-gutter: 1.1em,
-    stack(
-      spacing: 0.22cm,
-      text(size: 7.5pt, fill: faint)[文档编号],
-      text(font: mono, size: 9pt, fill: ink)[#doc-no],
-    ),
-    stack(
-      spacing: 0.22cm,
-      text(size: 7.5pt, fill: faint)[硬件版本],
-      text(font: mono, size: 9pt, fill: ink)[#hw-version],
-    ),
-    stack(
-      spacing: 0.22cm,
-      text(size: 7.5pt, fill: faint)[文档版本],
-      text(font: mono, size: 9pt, fill: ink)[#doc-version],
-    ),
-    stack(
-      spacing: 0.22cm,
-      text(size: 7.5pt, fill: faint)[发布日期],
-      text(font: mono, size: 9pt, fill: ink)[#date],
-    ),
+    columns: (auto, 1fr) * (meta-items.len() - 1) + (auto,),
+    ..meta-items.map(it => meta-cell(it.at(0), it.at(1))).intersperse([]),
   )
 ]
 
@@ -930,7 +955,7 @@
         #set text(size: 8pt, fill: faint)
         #grid(
           columns: (1fr, auto),
-          [#company], [#version],
+          [#product 产品规格书], [#version],
         )
         #v(5pt)
         #hairline()
@@ -943,7 +968,7 @@
         #set text(size: 8pt, fill: faint)
         #grid(
           columns: (1fr, auto),
-          [#product 产品规格书], [第 #counter(page).display() 页],
+          [#company], [第 #counter(page).display() 页],
         )
       ]
     },
@@ -964,8 +989,9 @@
   }
   set figure(numbering: "1", supplement: [图])
   set figure.caption(separator: [  ])
+  // 图注居中：图片多为居中或分栏摆放，左对齐会让说明文字脱离图本身
   show figure.caption: it => {
-    set align(left)
+    set align(center)
     set text(size: 8.5pt, fill: faint)
     v(3pt)
     it

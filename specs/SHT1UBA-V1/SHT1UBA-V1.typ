@@ -73,75 +73,11 @@
 
 == 系统框图
 
-#let block-diagram-frame(path, caption-text) = figure(
-  block(
-    width: 100%,
-    height: 220pt,
-    align(center + horizon, image(path, width: 100%, height: 100%, fit: "contain")),
-  ),
-  caption: caption-text,
-)
-
-#block-diagram-frame(
+#plate-fig(
   "/specs/SHT1UBA-V1/assets/system-block.svg",
   [系统功能框图 — 主芯片/模块与对外通信接口],
+  max-height: 220pt,
 )
-
-//== 技术参数
-
-//#spec-tbl(
-  //[无线协议], [Wi-Fi 802.11 b/g/n + BLE 5.0],
-  //[Flash / SRAM], [4 MB / 400 KB],
-  //[供电方式], [USB-C 5 V，或外部 3.3～5.5 V],
-  //[IO 电平], [3.3 V LVTTL，单 Pin ≤ 12 mA],
-  //[工作温度], [−20 °C ～ +70 °C（商业级）],
-  //[PCB], [2 层 FR-4，1.6 mm 厚],
-  //[尺寸], [25.4 mm × 48.3 mm × 8.5 mm（含 USB-C）],
-//)
-
-
-//= 外观与接口
-
-//#grid(
-  //columns: (1fr, 1fr),
-  //gutter: 14pt,
-  //figure(ph("正面视图 — USB-C · 天线 · GPIO", h: 155pt), caption: [正面视图]),
-  //figure(ph("背面视图 — Flash · LDO · 接地", h: 155pt), caption: [背面视图]),
-//)
-
-//#figure(
-  //ph("接口分布图 — 标注 J1～J4 位置（SVG 连接器高亮）", h: 175pt),
-  //caption: [接口分布],
-//)
-
-= 机械尺寸
-
-//== 外形尺寸
-
-#let mech-frame(path, caption-text) = figure(
-  block(
-    width: 100%,
-    height: 200pt,
-    align(center + horizon, image(path, width: 100%, height: 100%, fit: "contain")),
-  ),
-  caption: caption-text,
-)
-
-#grid(
-  columns: (1fr, 1fr),
-  gutter: 14pt,
-  mech-frame("/specs/SHT1UBA-V1/assets/mech_top.svg", [俯视图尺寸]),
-  mech-frame("/specs/SHT1UBA-V1/assets/mech_bottom.svg", [底视图尺寸]),
-)
-
-//#spec-tbl(
-  //[PCB 长度 (L)], [48.3 mm ± 0.2 mm],
-  //[PCB 宽度 (W)], [25.4 mm ± 0.2 mm],
-  //[PCB 厚度], [1.6 mm ± 0.15 mm],
-  //[最高高度 (H)], [8.5 mm（USB-C 连接器）],
-  //[GPIO 排针间距], [2.54 mm（2×10）],
-  //[重量], [约 8 g（含排针）],
-//)
 
 #pagebreak()
 
@@ -201,6 +137,7 @@
   [功放控制], [3], [MMCX · I-PEX], [模块外接射频功放SW控制接口],
 )
 
+==
 
 #conn-section(
   id: "conn-pwr",
@@ -322,7 +259,7 @@
   fig-desc: [天线区域局部特写],
   svg-paths: BOARD-SVGS,
   [Wi-Fi], [MMCX], [50 Ω], [2412-2462 MHz], [MMCX内孔形式],
-  [GNSS], [MMCX], [50 Ω], [1559-1577 MHz], [MMCX内孔形式，3.3V有源馈电，GNSS与主控IC的UART1进行通信],
+  [GNSS], [MMCX], [50 Ω], [1559-1577 MHz], [MMCX内孔形式，3.3V有源馈电],
 )
 
 //#note[
@@ -347,6 +284,21 @@
   svg-paths: BOARD-SVGS,
   [CTL_H], [MMCX/I-PEX], [O], [1.8 V], [输出高电平使能功放PA，低电平使能功放LNA，MMCX内孔形式，*连接器二选一*],
   [CTL_L], [MMCX], [O], [1.8 V], [输出低电平使能功放PA，高电平使能功放LNA，MMCX内孔形式],
+)
+
+#pagebreak()
+
+= 机械尺寸
+
+// 机械图缩至版心 2/3 宽，一图一行
+#plate-fig("/specs/SHT1UBA-V1/assets/mech_top.svg", [俯视图尺寸], max-height: 220pt, scale: 2 / 3)
+#v(1em)
+#plate-fig(
+  "/specs/SHT1UBA-V1/assets/mech_bottom.svg",
+  [底视图尺寸],
+  max-height: 220pt,
+  scale: 2 / 3,
+  ref-path: "/specs/SHT1UBA-V1/assets/mech_top.svg",
 )
 
 = 使用须知
