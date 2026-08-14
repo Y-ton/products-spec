@@ -57,7 +57,7 @@
 == 产品外观
 
 #figure(
-  image("/specs/SHT1UBA-V1/assets/product-overview.jpg", width: 70%),
+  image("/specs/SHT1UBA-V1/assets/product-overview.png", width: 70%),
   caption: [产品外观总览],
 )
 
