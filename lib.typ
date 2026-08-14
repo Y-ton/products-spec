@@ -95,7 +95,9 @@
   )
 }
 
-// 机械尺寸：俯视 / 底视 / 侧视。侧视默认不输出；需要占位或 SVG 时由规格书显式开启。
+// 机械尺寸：俯视 / 底视 / 侧视。侧视默认不输出；占位或 SVG 由规格书 #mech-plate-set 开启。
+// layout / scale / max-height 等显示参数请在各规格书 .typ 里写；此处仅为未写时的默认值。
+//   layout 默认 "row"；scale 默认 none（row→1.0，stack→0.88，相对列宽或版心）
 #let mech-plate-set(
   top: none,
   bottom: none,
@@ -106,27 +108,56 @@
   bottom-caption: [底视图尺寸],
   side-caption: [侧视图尺寸],
   side-ph: [侧视图 — Allegro 3D 剖面或 STEP 导出后，替换对应 mech\_side.svg],
-  max-height: 220pt,
-  side-max-height: 160pt,
-  scale: 2 / 3,
+  layout: "row",
+  max-height: 240pt,
+  side-max-height: 180pt,
+  scale: none,
+  column-gutter: 14pt,
 ) = {
   let ref = if ref-top != none { ref-top } else { top }
   let show-side = side != none or side-placeholder
-  if top != none {
-    plate-fig(top, top-caption, max-height: max-height, scale: scale)
-    if bottom != none or show-side { v(1em) }
+  let scale-use = if scale != none {
+    scale
+  } else if layout == "row" {
+    1.0
+  } else {
+    0.88
   }
-  if bottom != none {
-    plate-fig(bottom, bottom-caption, max-height: max-height, scale: scale, ref-path: ref)
-    if show-side { v(1em) }
-  }
-  if side != none {
-    plate-fig(side, side-caption, max-height: side-max-height, scale: scale, ref-path: ref)
+  let side-block = if side != none {
+    plate-fig(side, side-caption, max-height: side-max-height, scale: scale-use, ref-path: ref)
   } else if side-placeholder {
     figure(
       ph(side-ph, h: 140pt),
       caption: side-caption,
     )
+  }
+
+  let n = (if top != none { 1 } else { 0 }) + (if bottom != none { 1 } else { 0 }) + (if show-side { 1 } else { 0 })
+
+  if layout == "row" and n >= 2 {
+    grid(
+      columns: (1fr,) * n,
+      column-gutter: column-gutter,
+      ..if top != none {
+        (plate-fig(top, top-caption, max-height: max-height, scale: scale-use),)
+      } else { () },
+      ..if bottom != none {
+        (plate-fig(bottom, bottom-caption, max-height: max-height, scale: scale-use, ref-path: ref),)
+      } else { () },
+      ..if show-side { (side-block,) } else { () },
+    )
+  } else {
+    if top != none {
+      plate-fig(top, top-caption, max-height: max-height, scale: scale-use)
+      if bottom != none or show-side { v(1em) }
+    }
+    if bottom != none {
+      plate-fig(bottom, bottom-caption, max-height: max-height, scale: scale-use, ref-path: ref)
+      if show-side { v(1em) }
+    }
+    if show-side {
+      side-block
+    }
   }
 }
 
@@ -256,34 +287,41 @@
 // ── 连接器区块：标题 → 局部特写（高亮）→ Pin 表 ──────────────
 #let conn-badge(ref) = text(font: mono, size: 9pt, weight: "bold", fill: ink)[#ref]
 
-#let conn-cid(target-id) = if str(target-id).starts-with("conn-") {
-  str(target-id)
-} else {
-  "conn-" + str(target-id)
+// 连接器 id：.typ 里写什么，SVG 里就找什么（精确匹配）。
+// 成组接口另含 id 以「base-」开头的子项（如 cbb-ctl → cbb-ctl-l）。
+// conn-overlay-re 仅识别板图里的连接器高亮矩形，与查找 id 无关。
+#let conn-overlay-re() = regex("id=\"((?:conn|mbb|cbb)-[\\w-]+)\"")
+
+#let resolve-svg-id(svg-text, target-id) = {
+  let want = str(target-id)
+  if svg-text.contains("id=\"" + want + "\"") { want } else { none }
 }
 
 #let svg-has-id(svg-text, target-id) = {
-  svg-text.contains("id=\"" + conn-cid(target-id) + "\"")
+  resolve-svg-id(svg-text, target-id) != none
 }
 
-// 在一张 SVG 里按优先级找连接器 id（不含 conn- 前缀）
+#let conn-id-is-target(cid, target-id) = {
+  let want = str(target-id)
+  cid == want or cid.starts-with(want + "-")
+}
+
+// 在一张 SVG 里按优先级找连接器 id，返回 SVG 中的实际 id
 #let first-conn-id(svg-text, ids) = {
   let found = none
   for id in ids {
-    if found == none and svg-has-id(svg-text, id) {
-      found = id
+    if found == none {
+      found = resolve-svg-id(svg-text, id)
     }
   }
   found
 }
 
-// 将板图 SVG 中 id="conn-*" 高亮目标连接器；其余设为透明（不挡图纸）
-// 兼容 fill="#rrggbb" 属性，以及 style="fill:#rrggbb;..."（可写在 id 前）
+// 将板图 SVG 中连接器 id 高亮目标；其余设为透明（不挡图纸）
 #let highlight-svg(svg-text, target-id, hi: "2563eb", hi-opacity: "0.38") = {
-  let want = conn-cid(target-id)
-  let is-target(cid) = cid == want or cid.starts-with(want + "-")
+  let is-target(cid) = conn-id-is-target(cid, target-id)
   let step1 = svg-text.replace(
-    regex("style=\"([^\"]*?)fill:#([0-9A-Fa-f]{6})([^\"]*)\"(\\s+)id=\"(conn-[\\w-]+)\""),
+    regex("style=\"([^\"]*?)fill:#([0-9A-Fa-f]{6})([^\"]*)\"(\\s+)id=\"((?:conn|mbb|cbb)-[\\w-]+)\""),
     m => {
       let cid = m.captures.at(4)
       let before = m.captures.at(0)
@@ -300,7 +338,7 @@
     },
   )
   step1.replace(
-    regex("id=\"(conn-[\\w-]+)\"([^>]*?)fill=\"#([0-9A-Fa-f]{6})\""),
+    regex("id=\"((?:conn|mbb|cbb)-[\\w-]+)\"([^>]*?)fill=\"#([0-9A-Fa-f]{6})\""),
     m => {
       let cid = m.captures.at(0)
       let pre = m.captures.at(1)
@@ -343,7 +381,8 @@
 
 // 读取 conn-* 矩形几何；属性顺序不限。叠加祖先分组的平移/水平翻转，换算到可视坐标
 #let conn-visual-box(svg-text, target-id) = {
-  let cid = conn-cid(target-id)
+  let cid = resolve-svg-id(svg-text, target-id)
+  if cid == none { return none }
   let parts = svg-text.split("id=\"" + cid + "\"")
   if parts.len() < 2 { return none }
   let before = parts.at(0)
@@ -375,11 +414,10 @@
 // 同组的全部 id：conn-X 及 conn-X-*。Inkscape 复制对象会自动加 -7/-l 之类后缀，
 // 天线这类由多个座子组成的接口天然是一组。
 #let conn-group-ids(svg-text, base) = {
-  let want = conn-cid(base)
   let out = ()
-  for m in svg-text.matches(regex("id=\"(conn-[\\w-]+)\"")) {
+  for m in svg-text.matches(conn-overlay-re()) {
     let cid = m.captures.at(0)
-    if (cid == want or cid.starts-with(want + "-")) and not out.contains(cid) {
+    if conn-id-is-target(cid, base) and not out.contains(cid) {
       out = out + (cid,)
     }
   }
@@ -407,7 +445,8 @@
   (x: x0, y: y0, w: x1 - x0, h: y1 - y0)
 }
 
-// 以高亮座子为准裁切
+// 连接器特写裁切，按 PCB 实际尺寸自适应。优先级：
+// 1. 连接器完整露出  2. PCB 铺满图框（定比例）  3. 尽量露出最近板边
 #let zoom-to-conn(
   svg-text,
   target-id,
@@ -422,161 +461,58 @@
     conn-visual-box(svg-text, target-id)
   }
   if box == none { return svg-text }
-  let multi = group and conn-group-ids(svg-text, target-id).len() > 1
   let board = svg-board-bounds(svg-text)
-
-  let near-top = board != none and box.y < board.h * 0.12
-  let near-bottom = board != none and (box.y + box.h > board.h * 0.82)
-  let near-left = board != none and box.x < board.w * 0.20
-  let at-right-edge = board != none and (box.x + box.w > board.w * 0.85)
-  let in-right-region = board != none and (box.x > board.w * 0.60)
-  // 露出板子左缘；贴顶左侧成组座子仍按整幅 pad 取边距，放大倍率与底部接口一致
-  let show-left-edge = board != none and (
-    near-left or (near-top and box.x < board.w * 0.50)
-  )
-  let tight-group = multi and near-top and box.x < board.w * 0.50
-
-  // 横跨大半块板的成组接口宽度本身已够大，减半边距免得画幅过宽；
-  // 贴顶左侧的窄成组接口用整幅 pad，viewBox 宽度才与单接口特写落在同一档
-  let margin = calc.min(box.w, box.h) * (
-    if multi and not tight-group { pad / 2 } else { pad }
-  )
-
-  // 贴板边时 padding 往板内偏，避免 viewBox 落到板外大片空白
-  let top-pad = if near-top {
-    calc.min(margin, box.h * 0.35)
-  } else if near-bottom {
-    calc.max(margin, box.h * 1.8)
-  } else {
-    calc.min(margin, box.h * 0.45)
-  }
-  let bottom-pad = if near-bottom {
-    calc.min(margin * 0.15, 4.0)
-  } else if near-top {
-    calc.max(margin, box.h * 1.2)
-  } else {
-    calc.max(margin, box.h * 0.55)
-  }
-  let side-pad = margin
-  // 贴右缘座子：右侧 padding 不超出板边，避免 viewBox 右侧留白导致画面偏左
-  let pad-left = side-pad
-  let pad-right = if board != none and at-right-edge {
-    calc.max(3.0, calc.min(side-pad, board.w - (box.x + box.w) + 3.0))
-  } else {
-    side-pad
-  }
-  if board != none and show-left-edge {
-    pad-left = calc.max(3.0, box.x + 2.0)
-  } else if board != none and near-left {
-    pad-left = calc.max(3.0, calc.min(side-pad, box.x + 3.0))
-  }
-
-  // 统一画幅比例 → 图框等高；宽度由座子尺寸决定
-  let mut-vw = calc.max(box.w + pad-left + pad-right, min-w)
-  let mut-vh = mut-vw / aspect
-  let need-h = box.h + top-pad + bottom-pad
-  if mut-vh < need-h {
-    mut-vh = need-h
-    mut-vw = mut-vh * aspect
-  }
-
-  // 锚定高亮区；贴左/贴右时往板内偏，中间座子水平居中
+  let conn-r = box.x + box.w
+  let conn-b = box.y + box.h
   let cx = box.x + box.w / 2
-  let mut-vb-x = if show-left-edge {
-    0.0
-  } else if near-left {
-    calc.max(0.0, box.x - pad-left)
-  } else if at-right-edge or in-right-region {
-    calc.max(0.0, board.w - mut-vw)
-  } else {
-    cx - mut-vw / 2
+  let cy = box.y + box.h / 2
+
+  // 画幅：优先整板宽度铺满图框；座子比这更大时才放大画幅（仍保持比例）
+  let vw = if board != none { board.w } else { calc.max(box.w, min-w) }
+  let vh = vw / aspect
+  if box.h > vh {
+    vh = box.h
+    vw = vh * aspect
   }
-  let mut-vb-y = if near-top {
-    calc.max(0.0, box.y - top-pad)
-  } else if near-bottom {
-    calc.max(0.0, box.y - top-pad)
-  } else {
-    box.y - top-pad
+  if box.w > vw {
+    vw = box.w
+    vh = vw / aspect
   }
 
-  // 高亮区必须完整落在 viewBox 内
-  if not show-left-edge and box.x - pad-left < mut-vb-x {
-    mut-vb-x = calc.max(0.0, box.x - pad-left)
-  }
-  if box.x + box.w + pad-right > mut-vb-x + mut-vw {
-    mut-vw = box.x + box.w + pad-right - mut-vb-x
-    mut-vh = mut-vw / aspect
-  }
-  if box.y - top-pad < mut-vb-y {
-    mut-vb-y = calc.max(0.0, box.y - top-pad)
-  }
-  if box.y + box.h + bottom-pad > mut-vb-y + mut-vh {
-    mut-vh = box.y + box.h + bottom-pad - mut-vb-y
-    mut-vw = calc.max(mut-vw, mut-vh * aspect)
-  }
-
-  // 只压住负原点；右/下允许超出板边留白
+  let vb-x = 0.0
+  let vb-y = 0.0
   if board != none {
-    if mut-vb-x < 0.0 { mut-vb-x = 0.0 }
-    if mut-vb-y < 0.0 { mut-vb-y = 0.0 }
-    if not show-left-edge and box.x - pad-left < mut-vb-x {
-      mut-vb-x = calc.max(0.0, box.x - pad-left)
-    }
-    if box.y - top-pad < mut-vb-y {
-      mut-vb-y = calc.max(0.0, box.y - top-pad)
-    }
-    if box.x + box.w + pad-right > mut-vb-x + mut-vw {
-      mut-vw = box.x + box.w + pad-right - mut-vb-x
-    }
-    if box.y + box.h + bottom-pad > mut-vb-y + mut-vh {
-      mut-vh = box.y + box.h + bottom-pad - mut-vb-y
-    }
-    if near-bottom and board != none {
-      let max-y = board.h + bottom-pad
-      if mut-vb-y + mut-vh > max-y {
-        mut-vb-y = calc.max(0.0, max-y - mut-vh)
-      }
-    }
-    if mut-vw / mut-vh < aspect {
-      mut-vw = mut-vh * aspect
-    } else if mut-vw / mut-vh > aspect {
-      mut-vh = mut-vw / aspect
-    }
-    // aspect 调整后再定位一次，避免只往右扩宽导致贴右座子看起来偏左
-    if show-left-edge {
-      mut-vb-x = 0.0
-    } else if near-left {
-      mut-vb-x = calc.max(0.0, box.x - pad-left)
-    } else if at-right-edge or in-right-region {
-      mut-vb-x = calc.max(0.0, board.w - mut-vw)
-      if box.x - pad-left < mut-vb-x {
-        mut-vb-x = calc.max(0.0, box.x - pad-left)
-      }
+    // 水平：能铺满则贴左（左右板边都在画幅里）；画幅更宽时仍保证座子完整
+    vb-x = if vw <= board.w {
+      0.0
+    } else if cx < board.w / 2 {
+      0.0
     } else {
-      mut-vb-x = cx - mut-vw / 2
+      calc.max(conn-r - vw, board.w - vw)
     }
-    if box.x + box.w + pad-right > mut-vb-x + mut-vw {
-      mut-vw = box.x + box.w + pad-right - mut-vb-x
-      mut-vh = mut-vw / aspect
-      if at-right-edge or in-right-region {
-        mut-vb-x = calc.max(0.0, board.w - mut-vw)
-        if box.x - pad-left < mut-vb-x {
-          mut-vb-x = calc.max(0.0, box.x - pad-left)
-        }
-      }
-    }
-    if not show-left-edge and box.x - pad-left < mut-vb-x {
-      mut-vb-x = calc.max(0.0, box.x - pad-left)
-    }
-    if box.y + box.h + bottom-pad > mut-vb-y + mut-vh {
-      mut-vb-y = calc.max(0.0, box.y + box.h + bottom-pad - mut-vh)
-    }
-  }
+    if box.x < vb-x { vb-x = box.x }
+    if conn-r > vb-x + vw { vb-x = conn-r - vw }
 
-  let vb-x = mut-vb-x
-  let vb-y = mut-vb-y
-  let vw = mut-vw
-  let vh = mut-vh
+    // 垂直：先贴最近的顶/底边；若会裁掉座子再平移，座子完整优先于板边
+    if cy > board.h / 2 {
+      vb-y = board.h - vh
+    } else {
+      vb-y = 0.0
+    }
+    if box.y < vb-y { vb-y = box.y }
+    if conn-b > vb-y + vh { vb-y = conn-b - vh }
+    if vh <= board.h {
+      if vb-y < 0.0 { vb-y = 0.0 }
+      if vb-y + vh > board.h { vb-y = board.h - vh }
+      if box.y < vb-y { vb-y = box.y }
+      if conn-b > vb-y + vh { vb-y = conn-b - vh }
+    } else if vb-y > 0.0 {
+      vb-y = 0.0
+    }
+  } else {
+    vb-x = cx - vw / 2
+    vb-y = box.y
+  }
 
   let vb = svg-num(vb-x) + " " + svg-num(vb-y) + " " + svg-num(vw) + " " + svg-num(vh)
   svg-text
@@ -667,7 +603,7 @@
     // 成组时 base 允许是"虚"的：SVG 里只有 conn-base-* 子项、没有同名元素也算命中，
     // 否则 Inkscape 里只建了子项就整张图都找不着
     let found-id = if group and conn-group-ids(text, id).len() > 0 {
-      conn-cid(id)
+      id
     } else {
       first-conn-id(text, conn-id-candidates(id))
     }

@@ -23,7 +23,7 @@
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
      inkscape:zoom="3.3671"
-     inkscape:cx="192.89596"
+     inkscape:cx="192.74747"
      inkscape:cy="123.10297"
      inkscape:window-width="2560"
      inkscape:window-height="1570"
@@ -42,15 +42,6 @@
          id="stop1" />
     </linearGradient>
   </defs>
-  <g
-     id="layer-DrawingOriginOC"
-     transform="translate(-577.10137,-47.333298)"
-     style="display:inline">
-    <path
-       id="path2494"
-       d="m 995.49618,293.66929 h -4.8 m 2.4,2.4 v -4.8 m 0,1.248 c -1.536,0 -1.536,2.304 0,2.304 1.536,0 1.536,-2.304 0,-2.304 z"
-       style="fill:none;stroke:#000000;stroke-width:1.33333;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:0.482353" />
-  </g>
   <g
      id="layer-ComponentOC"
      transform="translate(-577.10137,-47.333298)"

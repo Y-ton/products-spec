@@ -106,6 +106,7 @@
   [接收灵敏度], [Wi-Fi：-90 dBm],
   [调制方式], [OFDM BPSK / QPSK / 16-QAM / 64-QAM],
   [传输速率], [Wi-Fi：最大 40 Mbps],
+  [模块无线参数], [见宸芯模块规格书],
 )
 
 == 软件特性
@@ -290,13 +291,19 @@
 
 = 机械尺寸
 
-// 侧视（可选）：
-//   不要侧视 — 不写 side / side-placeholder（如下）
-//   占位预留 — side-placeholder: true, side-caption: [...], side-ph: [...]
-//   已有 SVG — side: ".../mech_side.svg", side-caption: [...]
+// 机械图 — 在下方 #mech-plate-set 里按本产品调整（各规格书互不影响，改 lib.typ 不必动）：
+//   layout: "row"      俯视/底视一排并列（不写 layout 时 lib 默认也是 row）
+//   layout: "stack"    各图一行
+//   scale: 0.9        在本 .typ 写缩放；不写 scale 则用 lib 默认（row→1.0，stack→0.88）
+//   max-height: 260pt  单图最大高度（可选）
+//   侧视 — 不要：不写 side；占位：side-placeholder: true；有图：side: "路径"
 #mech-plate-set(
   top: "/specs/SHT1UBA-V1/assets/mech_top.svg",
   bottom: "/specs/SHT1UBA-V1/assets/mech_bottom.svg",
+  layout: "stack",
+//  layout: "row",
+//  scale: 0.9,
+//  max-height: 260pt,
   top-caption: [俯视图尺寸],
   bottom-caption: [底视图尺寸],
 //  side-placeholder: true,

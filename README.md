@@ -62,13 +62,17 @@ typst compile specs/SHT1MBB-SHT1CBB-V1/SHT1MBB-SHT1CBB-V1.typ \
 | `mech_cbb_top.svg` / `mech_cbb_bottom.svg` / `mech_cbb_side.svg` | CBB 机械三视图 |
 | `mech_assy_side.svg` | **组合总成侧视**（两板扣合后总高度与侧向轮廓） |
 
-`.typ` 里 `BOARD-SVGS` 只列**板图**；机械图用 `#mech-plate-set(...)`。**侧视默认不显示**，由规格书自行决定：
+`.typ` 里 `BOARD-SVGS` 只列**板图**；机械图用 `#mech-plate-set(...)`。**排版与缩放写在各规格书 `.typ` 里**（不同产品可不同）；`lib.typ` 只提供未写参数时的默认值。
 
-| 需求 | 写法 |
+| 需求 | 写法（在对应 `SHT1xxx.typ` 的 `#mech-plate-set` 里） |
 |------|------|
-| 不要侧视 | 只写 `top` / `bottom`（不写 `side`、`side-placeholder`） |
+| 不要侧视 | 只写 `top` / `bottom` |
 | 占位预留 | `side-placeholder: true` + `side-caption` / `side-ph` |
 | 已有 SVG | `side: ".../mech_side.svg"` + `side-caption` |
+| 一排并列 | `layout: "row"`（lib 默认，可省略） |
+| 各图一行 | `layout: "stack"` |
+| **缩放** | **`scale: 0.9`**（在本 `.typ` 写；省略则 row→1.0、stack→0.88） |
+| 限高 | `max-height: 260pt` |
 
 **Allegro 机械图来源**
 
@@ -80,7 +84,7 @@ typst compile specs/SHT1MBB-SHT1CBB-V1/SHT1MBB-SHT1CBB-V1.typ \
 
 侧视就绪后，在 `#mech-plate-set` 里设 `side: ".../mech_side.svg"`（或先 `side-placeholder: true` 占位）。
 
-Inkscape 导出：每个连接器用 `<rect id="conn-xxx">` 标记；成组接口用 `conn-base` + `conn-base-*` 子 id。
+Inkscape 导出：每个连接器用 `<rect id="…">` 标记，**id 须与 `.typ` 里 `#conn-section(id: "…")` 完全一致**（如 `conn-pwr`、`mbb-pwr`、`cbb-usb`）。成组接口用 `base` + `base-*` 子 id（如 `cbb-ctl` + `cbb-ctl-l`）。
 
 ## GitHub Pages 预览
 
